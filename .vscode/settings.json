@@ -1,0 +1,5 @@
+{
+    "chat.agent.enabled": false,
+    "chat.notifyWindowOnConfirmation": false,
+    "telemetry.feedback.enabled": false
+}

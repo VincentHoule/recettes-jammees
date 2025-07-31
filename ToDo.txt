@@ -1,0 +1,6 @@
+Porjet personnel
+
+1- Finir l'api
+2- Connection avec React
+3- Voir les recette
+4- Consulter une recette
