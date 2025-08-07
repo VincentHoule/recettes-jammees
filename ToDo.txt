@@ -1,6 +1,8 @@
-Porjet personnel
+Projet personnel
 
-1- Finir l'api
-2- Connection avec React
-3- Voir les recette
-4- Consulter une recette
+0- Page + Api créer un compte
+1- Page pour crud
+2- Page de profile
+3- Api crud
+4- Recette
+

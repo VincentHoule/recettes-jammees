@@ -6,13 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * Modèle d'ingrédient
+ */
 class Ingredient extends Model
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
+     * Attributs d'un ingrédient.
      *
      * @var list<string>
      */
@@ -22,4 +25,7 @@ class Ingredient extends Model
         'unit',
         'recipe_id'
     ];
+
+    protected $table = 'ingredient';
+
 }

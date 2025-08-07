@@ -6,13 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * Modèle d'une recette
+ */
 class Recipe extends Model
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
+     * Attributs d'une recette
      *
      * @var list<string>
      */
@@ -24,6 +27,6 @@ class Recipe extends Model
         'category,'
     ];
 
-    protected $table = 'recipes';
+    protected $table = 'recipe';
 
 }

@@ -15,7 +15,7 @@ class RecipeSeeder extends Seeder
     public function run(): void
     {
 
-        DB::table('recipes')->insert([
+        DB::table('recipe')->insert([
             [
                 'name' => 'Grill-Cheese',
                 'description' => 'Un sandwitch chaud au fromage',

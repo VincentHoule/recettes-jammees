@@ -13,7 +13,7 @@ class IngredientSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('ingredients')->insert([
+        DB::table('ingredient')->insert([
             [
                 'name' => "Pain tranché.",
                 'quantity' => 2,

@@ -3,12 +3,15 @@ import './App.css'
 import { createTheme, ThemeProvider } from '@mui/material';
 import Home from './pages/Home';
 import Layout from './pages/Layout';
-import RecipeContextProvider from './contexts/RecipeContext';
 import Login from './pages/Login';
+import SignIn from './pages/SignIn';
+import Profile from './pages/Profile';
+import CreateRecipe from './pages/CreateRecipe';
+import ModifyRecipe from './pages/ModifyRecipe';
 
 const theme = createTheme({
   palette: {
-    mode: 'light',
+    mode: 'dark',
     primary: {
       main: '#d4b1e2',
     },
@@ -26,16 +29,16 @@ function App() {
     <>
       <BrowserRouter>
         <ThemeProvider theme={theme}>
-          <RecipeContextProvider>
-            <Routes>
-              <Route path="/" element={<Layout />}>
-                <Route path='/' element={<Home />} />
-              </Route>
-              <Route path="/login"element={<Login/>}/>
-              <Route path="/signIn"/>
-            </Routes>
-          </RecipeContextProvider>
-
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route path='/' element={<Home />} />
+              <Route path='/myRecipes' element={<Profile />} />
+            </Route>
+            <Route path="/login" element={<Login />} />
+            <Route path='/createRecipe' element={<CreateRecipe />} />
+            <Route path='/modifyRecipe/:id' element={<ModifyRecipe />} />
+            <Route path="/signIn" element={<SignIn />} />
+          </Routes>
         </ThemeProvider>
       </BrowserRouter>
     </>

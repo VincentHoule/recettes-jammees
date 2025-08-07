@@ -1,117 +1,121 @@
 import { Alert, Backdrop, Box, Button, Card, CircularProgress, Container, CssBaseline, Snackbar, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router";
-import { Error } from "@mui/icons-material";
-import Api from "../utils/Api";
 
-/**
- * Page de connexion d'un utilisateur
- * @returns page de connexion
- */
-export default function Login() {
-    // Valeur des champs
+import Api from "../utils/Api";
+import { Error } from "@mui/icons-material";
+
+
+export default function SignIn() {
+    const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
     const [redirect, setRedirect] = useState(false);
     const [loading, setLoading] = useState(false);
+
     const [errors, setErrors] = useState({
+        name: "",
         email: "",
         password: "",
-        login: ""
+        signIn: ""
     })
 
-    /**
-     * Réinitialiser en jour les erreurs
-     */
     useEffect(() => {
         setErrors({
+            name: "",
             email: "",
             password: "",
-            login: ""
+            signIn: ""
         })
     }, [])
 
-    /**
-     * Validation du champs courriel
-     * @returns bool s'il est valide
-     */
-    const handleValidateEmail = () => {
-        setErrors((prevState) => ({ ...prevState, email: "" }));
+    const handleValidateName = () => {
+        setErrors((prevState) => ({ ...prevState, name: "" }));
 
-        if (email == null) {
-            setErrors((prevState) => ({ ...prevState, email: "Veuillez rentrez votre addresse courriel." }));
+        if (name == null) {
+            setErrors((prevState) => ({ ...prevState, name: "Veuillez rentrez votre nom de Chef." }));
             return false;
         }
-        else if (!email.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i)) {
-            setErrors((prevState) => ({ ...prevState, email: "Votre addresse courriel contient des erreurs." }));
+        else if (name.length <= 0) {
+            setErrors((prevState) => ({ ...prevState, name: "Votre nom doit contenir au moins 1 caractère." }));
             return false;
         }
         return true;
+
     }
 
-    /**
-     * Validation du champs
-     * @returns bool s'il est valide
-     */
+    const handleValidateEmail = () => {
+        setErrors((prevState) => ({ ...prevState, email: "" }));
+        if (email == null) {
+            setErrors((prevState) => ({ ...prevState, email: "Veuillez rentrez votre addresse courriel." }));
+
+            return false;
+        }
+        else if (email.length <= 0) {
+            setErrors((prevState) => ({ ...prevState, email: "Votre addresse courriel doit contenir au moins 1 caractère." }));
+
+            return false;
+        }
+        else if (!email.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i)) {
+            setErrors((prevState) => ({ ...prevState, email: "Le format de l'adresse courriel est invalide." }));
+
+            return false;
+        }
+        return true;
+
+    }
+
+
     const handleValidatePassword = () => {
         setErrors((prevState) => ({ ...prevState, password: "" }));
 
         if (password == null) {
-            setErrors((prevState) => ({ ...prevState, password: "Veuillez rentrez votre mot de passe." }));
+            setErrors((prevState) => ({ ...prevState, password: "Veuillez rentrez un mot de passe." }));
+            return false;
+        }
+        else if (password.length <= 5) {
+            setErrors((prevState) => ({ ...prevState, password: "Votre mot de passe doit contenir au moins 6 caractère." }));
             return false;
         }
         return true;
     }
 
     const handleCloseError = () => {
-        setErrors((prevState) => ({ ...prevState, login: "" }));
+        setErrors((prevState) => ({ ...prevState, signIn: "" }));
     }
 
-    const handleLogin = () => {
-
-        if (handleValidateEmail() && handleValidatePassword()) {
+    const handleSignIn = () => {
+        if (handleValidateEmail() && handleValidateName() && handleValidatePassword()) {
             setLoading(true);
 
             const formData = new FormData()
+            formData.append("name", name);
             formData.append("email", email);
             formData.append("password", password);
 
-            Api.post("/api/user/login", formData).then((response) => {
+            Api.post("/api/user/signIn", formData).then((response) => {
                 setLoading(false);
                 localStorage.setItem("id", response.data[0].id);
                 localStorage.setItem("name", response.data[0].name);
                 localStorage.setItem("email", response.data[0].email);
                 setRedirect(true);
 
-
             }).catch((error) => {
                 setLoading(false);
-
-                if (error.response.status === 500) {
+                if (error.response.status === 422) {
                     setErrors((prevState) => ({
                         ...prevState,
-                        login: "Une erreur est survenu.\n Veuillez réesayer plus tard."
+                        email: error.response.data.message
                     }))
-                }
-                else if (error.response.status == 401) {
-                    setErrors((prevState) => ({
-                        ...prevState,
-                        email: error.response.data.email,
-                        password: error.response.data.password
-                    }))
-
                 }
                 else {
                     setErrors((prevState) => ({
                         ...prevState,
-                        login: "Une erreur est survenu.\n Veuillez réesayer plus tard."
+                        signIn: "Une erreur est survenu.\n Veuillez réesayer plus tard."
                     }))
                 }
-
-            })
+            });
         }
-
     }
 
     return (
@@ -124,10 +128,10 @@ export default function Login() {
                 <CircularProgress />
             </Backdrop>
             {!redirect || <Navigate to="/" />}
-            <Snackbar open={errors.login != ""} autoHideDuration={6000} onClose={handleCloseError}>
+            <Snackbar open={errors.signIn != ""} autoHideDuration={6000} onClose={handleCloseError}>
                 <Alert onClose={handleCloseError} severity="error"
                     sx={{ width: '100%' }} icon={<Error fontSize="inherit" />}>
-                    {errors.login}
+                    {errors.signIn}
                 </Alert>
             </Snackbar>
             <Container disableGutters sx={{
@@ -146,7 +150,7 @@ export default function Login() {
                         variant="h4"
                         sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
                     >
-                        Se connecter
+                        Inscription
                     </Typography>
                     <Box
                         sx={{
@@ -156,6 +160,20 @@ export default function Login() {
                             gap: 2,
                         }}
                     >
+                        <Typography>Nom de chef</Typography>
+                        <TextField
+                            type="name"
+                            name="name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Chef Sweedish"
+                            onBlur={handleValidateName}
+                            error={errors.name.length > 0}
+                            helperText={errors.name}
+                            autoFocus
+                            fullWidth
+                            variant="outlined"
+                        />
                         <Typography>Courriel</Typography>
                         <TextField
                             type="email"
@@ -185,23 +203,20 @@ export default function Login() {
                             fullWidth
                             variant="outlined"
                         />
-
                         <Button
-                            type="submit"
                             fullWidth
                             variant="contained"
-                            onClick={handleLogin}
-
+                            onClick={handleSignIn}
                         >
-                            Se Connecter
+                            Créer son compte
                         </Button>
                         <Typography variant="caption">OU</Typography>
                         <Button
-                            key={"/signIn"}
+                            key={"/login"}
                             component={Link}
-                            to={"/signIn"}
+                            to={"/login"}
                         >
-                            S'Inscrire
+                            Se Connecter
                         </Button>
                         <Button
                             sx={{ textTransform: "none" }}
@@ -216,7 +231,7 @@ export default function Login() {
                 </Card>
             </Container>
 
-
         </>
+
     );
 }

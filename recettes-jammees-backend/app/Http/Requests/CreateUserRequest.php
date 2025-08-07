@@ -1,12 +1,11 @@
 <?php
-
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
-class SelectRecipesAllRequest extends FormRequest
+class CreateUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -17,21 +16,18 @@ class SelectRecipesAllRequest extends FormRequest
     }
 
     /**
-     * Règle de validation de la requete
+     * Règle de validation de la requête
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {   
-        $order = ['created_at', 'name'];
-        $dircetion = ['desc', 'asc'];
-        $category = ['repas', 'dessert', 'breuvage'];
+
 
         return [
-            'order' => Rule::in($order),
-            'direction' => Rule::in($dircetion),
-            'category' => 'nullable',
-            'research' => 'string|nullable',
+            'name' => 'required|string|min:1',
+            'email' => 'required|string|email|min:2|max:125|regex:/^[a-zA-Z0-9_\.\-]+@[a-zA-Z0-9_\.\-]+\.[a-zA-Z0-9_\.\-]{2,4}$/',
+            'password'=>'required|string|min:6'
 
         ];
     }

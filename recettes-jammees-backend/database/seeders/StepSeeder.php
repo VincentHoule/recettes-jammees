@@ -13,7 +13,7 @@ class StepSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('steps')->insert([
+        DB::table('step')->insert([
             [
                 'recipe_id' => 1,
                 'description' => "Étaller du beurre sur un des cotés des deux tranches de pain.",

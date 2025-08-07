@@ -3,14 +3,26 @@
 namespace Tests\Feature;
 
 // use Illuminate\Foundation\Testing\RefreshDatabase;
+
+use App\Models\Recipe;
 use Tests\TestCase;
 
-class ExampleTest extends TestCase
+class RecetteTest extends TestCase
 {
+
+    private $recipe;
+
+    private $user;
+
+
+    public function setUp(): void {
+        
+    }
+
     /**
      * A basic test example.
      */
-    public function test_the_application_returns_a_successful_response(): void
+    public function GetAllRecipe(): void
     {
         $response = $this->get('/');
 

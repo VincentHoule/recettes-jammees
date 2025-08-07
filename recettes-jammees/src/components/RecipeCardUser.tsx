@@ -5,30 +5,52 @@ import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import type Recipe from '../interfaces/Recipe';
-import { AppBar, Chip, Container, Dialog, Divider, IconButton, List, ListItem, ListItemText, Toolbar } from '@mui/material';
+import { Alert, AppBar, Chip, Container, Dialog, Divider, IconButton, List, ListItem, ListItemText, Snackbar, Toolbar } from '@mui/material';
 import { useState } from 'react';
-import { Close } from '@mui/icons-material';
+import { CheckCircleOutline, Close, Error } from '@mui/icons-material';
 import type Ingredient from '../interfaces/Ingredient';
 import type Step from '../interfaces/Step';
 import Api from "../utils/Api";
 import Loading from './Loading';
+import { Link } from 'react-router';
 
 /**
- * Carte recette de la page Home
+ * Paramètre de la carte recette utilisateur
  * @param recipe Recette
- * @returns Une carte de recette
+ * @param handleDelete Fonction qui donne un retour utilisateur de la suppression
  */
-export default function RecipeCard(recipe: Recipe) {
+interface RecipeCardUserProps {
+    recipe: Recipe,
+    handleDelete: (recipe: Recipe) => void
+}
+
+/**
+ * Fonction qui affiche une carte de recette qui appartient à son utilisateur
+ * @param props Paramètres
+ * @returns carte recette de l'utilisateur
+ */
+export default function RecipeCardUser(props: RecipeCardUserProps) {
     const [openRecipe, setOpenRecipe] = useState(false);
     const [steps, setSteps] = useState([]);
     const [ingredients, setIngredients] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [info, setInfo] = useState(false);
+    const [infoMessage, setInfoMessage] = useState("");
+    const [icon, setIcon] = useState<React.JSX.Element>(<Error fontSize='inherit' />);
+    const [color, setColor] = useState("");
 
     /**
-     * Ferme la recette en détail
-     */
+      * Ferme la recette en détail
+      */
     const handleClose = () => {
         setOpenRecipe(false)
+    }
+
+    /**
+     * Ferme la popup du retour utilisateur
+     */
+    const handleCloseInfo = () => {
+        setInfo(false)
     }
 
     /**
@@ -37,55 +59,93 @@ export default function RecipeCard(recipe: Recipe) {
     const handleOpen = () => {
         setLoading(true);
 
-        // Va chercher les ingrédients et les étapes
-        Api.get(`/api/recipe/details/${recipe.id}`).then((response) => {
+        Api.get(`/api/recipe/details/${props.recipe.id}`).then((response) => {
             setOpenRecipe(true);
             setSteps(response.data.step);
             setIngredients(response.data.ingredient);
             setLoading(false);
 
-
         }).catch((_) => {
             setLoading(false);
+            setColor("error");
+            setIcon(<Error fontSize='inherit' />)
+            setInfoMessage("La consultation de la recette a échoué. Veuillez réessayer plus tard.")
+            setInfo(true)
+
 
         })
     }
 
+    /**
+     * Supprime la carte et la recette
+     */
+    const handleDelete = () => {
+        setLoading(true)
+        Api.delete(`/api/recipe/delete/${props.recipe.id}`).then((_) => {
+            setLoading(false);
+
+        }).catch((_) => {
+            setLoading(false);
+            setColor("error");
+            setIcon(<Error fontSize='inherit' />)
+            setInfoMessage("La suppression de la recette a échoué. Veuillez réessayer plus tard.")
+            setInfo(true)
+        })
+        props.handleDelete(props.recipe)
+    }
+
+
     return (
         <>
             {/*Chargement de l'information*/}
-            <Loading loading={loading}/>
+            <Loading loading={loading} />
+            <Snackbar open={info} autoHideDuration={6000} onClose={handleCloseInfo}>
+                <Alert onClose={handleCloseInfo} severity={color == "success" ? "success" : "error"}
+                    sx={{ width: '100%' }} icon={icon}>
+                    {infoMessage}
+                </Alert>
+            </Snackbar>
             <Card sx={{ width: "325px" }}>
                 <CardMedia
                     sx={{ height: 200 }}
-                    image={recipe.image == null ? "../../public/plat.jpg" : recipe.image}
-                    title={recipe.name}
+                    image={props.recipe.image == null ? "../../public/plat.jpg" : props.recipe.image}
+                    title={props.recipe.name}
                 />
-                <CardContent sx={{display:'flex', flexDirection:"column"}}>
-                    <Container sx={{marginBottom:"5px"}}>
+                <CardContent sx={{ display: 'flex', flexDirection: "column" }}>
+                    <Container sx={{ marginBottom: "5px" }}>
                         <Typography gutterBottom component="div">
-                            {recipe.name.length <= 18 ? recipe.name: (recipe.name.slice(0, 20) + "...")}
+                            {props.recipe.name.length <= 18 ? props.recipe.name : (props.recipe.name.slice(0, 20) + "...")}
                         </Typography>
                     </Container>
                     <Container>
                         <Typography gutterBottom variant="body2" >
-                            {recipe.description.length <= 18 ? recipe.description: (recipe.description.slice(0, 20) + "...")}
+                            {props.recipe.description.length <= 18 ? props.recipe.description : (props.recipe.description.slice(0, 20) + "...")}
                         </Typography>
-                        <Container disableGutters sx={{display:"flex", gap : "50px", justifyContent: "center"}}>
-                            <Chip color='secondary' label={recipe.category} variant="outlined" />
+                        <Container disableGutters sx={{ display: "flex", gap: "50px", justifyContent: "center" }}>
+                            <Chip color='secondary' label={props.recipe.category} variant="outlined" />
 
                             <Typography variant="caption">
-                                {recipe.created_at.split(' ')[0]}
+                                {props.recipe.created_at.split(' ')[0]}
                             </Typography>
                         </Container>
                     </Container>
                 </CardContent>
-                <CardActions sx={{display:"flex", flexDirection:"row-reverse"}}>
+                <CardActions sx={{ display: "flex", flexDirection: "row-reverse", justifyContent: "space-between" }}>
+                    <Button variant="outlined" color='error' onClick={handleDelete} size="small">Supprimer</Button>
+                    <Button
+                        variant="outlined"
+                        color='secondary'
+                        key={`/modifyRecipe/${props.recipe.id}`}
+                        component={Link}
+                        to={`/modifyRecipe/${props.recipe.id}`}
+                        size="small">
+                        Modifier
+                    </Button>
                     <Button variant="outlined" color='primary' onClick={handleOpen} size="small">Consulter</Button>
                 </CardActions>
             </Card >
-            
-            {/* Section de la recette en détail*/}
+
+            {/*Page de consultation en détail de la recette */}
             <Dialog
                 fullScreen
                 open={openRecipe}
@@ -102,18 +162,18 @@ export default function RecipeCard(recipe: Recipe) {
                             <Close />
                         </IconButton>
                         <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-                            {recipe.name}
+                            {props.recipe.name}
                         </Typography>
                     </Toolbar>
                 </AppBar>
                 <Container >
                     <Container>
-                        <Typography>{recipe.name}</Typography>
-                        <Typography>{recipe.description}</Typography>
+                        <Typography>{props.recipe.name}</Typography>
+                        <Typography>{props.recipe.description}</Typography>
                         <CardMedia
                             sx={{ height: 200 }}
-                            image={recipe.image == null ? "../../public/plat.jpg" : recipe.image}
-                            title={recipe.name}
+                            image={props.recipe.image == null ? "../../public/plat.jpg" : props.recipe.image}
+                            title={props.recipe.name}
                         />
                     </Container>
                     <Container>

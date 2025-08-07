@@ -6,13 +6,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 
+
+/**
+ * Modèle d'une étape
+ */
 class Step extends Model
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
+     * Attributs d'une étape.
      *
      * @var list<string>
      */
@@ -21,4 +25,7 @@ class Step extends Model
         'description',
         'position',
     ];
+
+    protected $table = 'step';
+
 }

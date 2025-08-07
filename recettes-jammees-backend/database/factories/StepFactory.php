@@ -6,7 +6,7 @@ use App\Models\Recipe;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Step>
+ * Créateur d'étape
  */
 class StepFactory extends Factory
 {
