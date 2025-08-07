@@ -1,8 +1,0 @@
-Projet personnel
-
-0- Page + Api créer un compte
-1- Page pour crud
-2- Page de profile
-3- Api crud
-4- Recette
-
