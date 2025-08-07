@@ -9,6 +9,9 @@ import Api from "../utils/Api";
 import type Step from "../interfaces/Step";
 import Loading from "../components/Loading";
 
+/**
+ * Valeur par défault d'un ingrédient
+ */
 const ingredientDummy = {
     id: 0,
     name: "",
@@ -17,9 +20,16 @@ const ingredientDummy = {
     recipe_id: 0
 }
 
+
+/**
+ * Fonction qui affiche le formulaire de modification d'une recette
+ * @returns le formulaire de modification
+ */
 export default function ModifyRecipe() {
+
     const exampleDescription = "Pâtisseries empoisonnées \nLes beignets mortels \nMoui \nMacarons foudroyants \nPas mal \nTarte au venin de vipère \nClassique \nClafoutis au curare \nBof \nHaaa le pudding à l'arsenic \nOh oui!\nDans un grand bol de strychnine \nDélayez de la morphine \nFaites tiédir à la casserole \nUn bon verre de pétrole \nHo ho, je vais en mettre deux \nQuelques gouttes de  ... "
 
+    // Donnée de la recette
     const { id } = useParams()
     const [name, setName] = useState("")
     const [description, setDescription] = useState("")
@@ -29,6 +39,8 @@ export default function ModifyRecipe() {
     const [steps, setSteps] = useState<Array<Step>>([])
 
     const [loading, setLoading] = useState(false)
+
+    // Élément du popup d'information
     const [info, setInfo] = useState(false);
     const [infoMessage, setInfoMessage] = useState("");
     const [icon, setIcon] = useState<React.JSX.Element>(<Error fontSize='inherit' />);
@@ -43,6 +55,9 @@ export default function ModifyRecipe() {
         create: ""
     })
 
+    /**
+     * Valeur de la recette à modifier
+     */
     useEffect(() => {
         setLoading(true);
         Api.get(`/api/recipe/details/${id}`).then((response) => {
@@ -63,6 +78,9 @@ export default function ModifyRecipe() {
         })
     }, []);
 
+    /**
+     * Actualise l'ordre des étapes
+     */
     useEffect(() => {
         if (steps != undefined) {
             const stepsDummy: Array<Step> | undefined = steps.map((step, index) => {
@@ -73,11 +91,19 @@ export default function ModifyRecipe() {
         }
     }, [steps.length])
 
+    /**
+     * Ferme le popup d'information
+     */
     const handleCloseInfo = () => {
         setInfo(false);
     }
 
 
+    /**
+     * Fonction qui modifie les valeurs de l'ingrédient
+     * @param ingredientNew nouvelles valeurs de l'ingrédient
+     * @param indexNew position dans le tableau de l'ingrédient
+     */
     const updateIngredient = (ingredientNew: Ingredient, indexNew: number) => {
         if (ingredients != undefined) {
 
@@ -92,13 +118,20 @@ export default function ModifyRecipe() {
         }
     }
 
+    /**
+     * Ajoute un ingrédient au formulaire
+     */
     const addIngredient = () => {
         if (ingredients != undefined) {
             setIngredients([...ingredients, ingredientDummy])
         }
     }
 
-
+    /**
+     * Fonction qui modifie la valeur de l'étape
+     * @param stepNew nouvelle valeur de l'étape
+     * @param indexNew position de l'étape dans le tableau
+     */
     const updateStep = (stepNew: Step, indexNew: number) => {
         if (steps != undefined) {
             const stepsDummy: Array<Step> | undefined = steps.map((step, index) => {
@@ -115,6 +148,9 @@ export default function ModifyRecipe() {
         }
     }
 
+    /**
+     * Ajoute une étape au formulaire
+     */
     const addStep = () => {
         if (steps != undefined) {
             setSteps([...steps, {
@@ -126,6 +162,10 @@ export default function ModifyRecipe() {
         }
     }
 
+    /**
+     * Validation du nom de la recette
+     * @returns bool s'il est valide
+     */
     const handleValidateName = () => {
         setErrors((prevstate) => ({ ...prevstate, name: "" }))
 
@@ -136,6 +176,10 @@ export default function ModifyRecipe() {
         return true
     }
 
+    /**
+     * Validation de la description de la recette
+     * @returns bool s'il est valide
+     */
     const handleValidateDescription = () => {
         setErrors((prevstate) => ({ ...prevstate, description: "" }))
 
@@ -147,6 +191,10 @@ export default function ModifyRecipe() {
 
     }
 
+    /**
+     * Validation de la catégorie de la recette
+     * @returns bool s'il est valide
+     */
     const handleValidateCategory = () => {
         setErrors((prevstate) => ({ ...prevstate, category: "" }))
 
@@ -158,6 +206,10 @@ export default function ModifyRecipe() {
 
     }
 
+    /**
+     * Validation de l'url de l'image de la recette
+     * @returns bool s'il est valide
+     */
     const handleValidateUrl = () => {
         setErrors((prevstate) => ({ ...prevstate, url: "" }))
 
@@ -169,6 +221,10 @@ export default function ModifyRecipe() {
 
     }
 
+    /**
+     * Validation des ingrédients de la recette
+     * @returns bool s'il est valide
+     */
     const handleValidateIngredients = () => {
         setErrors((prevstate) => ({ ...prevstate, ingredients: "" }))
         ingredients.map((ingredient: Ingredient) => {
@@ -191,6 +247,10 @@ export default function ModifyRecipe() {
 
     }
 
+     /**
+     * Validation des étapes de la recette
+     * @returns bool s'il est valide
+     */
     const handleValidateSteps = () => {
         setErrors((prevstate) => ({ ...prevstate, steps: "" }))
         steps.map((step: Step) => {
@@ -206,12 +266,17 @@ export default function ModifyRecipe() {
 
     }
 
+    /**
+     * Gère la modification de la recette
+     */
     const handleModifyRecipe = () => {
 
+        // Validation des champs
         if (handleValidateName() && handleValidateCategory() && handleValidateDescription()
             && handleValidateIngredients() && handleValidateSteps() && handleValidateUrl()) {
             const user_id = localStorage.getItem("id");
-
+            
+            // Paramètres
             const formData = new FormData()
             if (id != undefined) {
                 formData.append("id", id);
@@ -226,7 +291,9 @@ export default function ModifyRecipe() {
                 formData.append("ingredients", JSON.stringify(ingredients));
 
                 setLoading(true)
+                // requête
                 Api.post(`/api/recipe/updateRecipe`, formData).then((_) => {
+                    // retour utilisateur
                     setColor("success");
                     setIcon(<CheckCircleOutline fontSize='inherit' />)
                     setInfoMessage("La modification de la recette a réussit. ")
@@ -234,6 +301,7 @@ export default function ModifyRecipe() {
                     setLoading(false)
 
                 }).catch((_) => {
+                    // retour utilisateur
                     setColor("error");
                     setIcon(<Error fontSize='inherit' />)
                     setInfoMessage("La modification de la recette a échoué. ")

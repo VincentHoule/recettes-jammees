@@ -51,7 +51,7 @@ export default function Login() {
     }
 
     /**
-     * Validation du champs
+     * Validation du champs mot de passe
      * @returns bool s'il est valide
      */
     const handleValidatePassword = () => {
@@ -64,19 +64,28 @@ export default function Login() {
         return true;
     }
 
+    /**
+     * Fermer le retour utilisateur
+     */
     const handleCloseError = () => {
         setErrors((prevState) => ({ ...prevState, login: "" }));
     }
 
+    /**
+     * Gère la connexion
+     */
     const handleLogin = () => {
 
+        // Validation des champs
         if (handleValidateEmail() && handleValidatePassword()) {
             setLoading(true);
 
+            // paramètres
             const formData = new FormData()
             formData.append("email", email);
             formData.append("password", password);
 
+            // requête
             Api.post("/api/user/login", formData).then((response) => {
                 setLoading(false);
                 localStorage.setItem("id", response.data[0].id);
